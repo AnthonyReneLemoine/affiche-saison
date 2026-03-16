@@ -1,0 +1,1251 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Créateur d'affiches A3</title>
+  <style>
+    @font-face {
+      font-family: "VAG Rounded Std";
+      font-style: normal;
+      font-weight: 700;
+      src: local("VAG Rounded Std Bold"), local("VAG Rounded Std");
+    }
+    body {
+      font-family: "VAG Rounded Std", "VAG Rounded Std Bold", "Arial Rounded MT Bold", "Helvetica Neue", Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 24px;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      background: #fff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    h1 {
+      margin-top: 0;
+    }
+    h2 {
+      font-size: 1.1rem;
+      margin: 0 0 12px 0;
+    }
+    .grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    label {
+      font-weight: 600;
+      display: block;
+      margin-bottom: 6px;
+    }
+    input[type="text"],
+    textarea,
+    select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+    textarea {
+      min-height: 80px;
+      resize: vertical;
+    }
+    .actions {
+      margin-top: 24px;
+      display: flex;
+      gap: 12px;
+    }
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 16px;
+    }
+    .tab-button {
+      border: 1px solid #ddd;
+      background: #f4f4f4;
+      padding: 8px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .tab-button.active {
+      background: #f2d20a;
+      border-color: #f2d20a;
+    }
+    .tab-panel {
+      display: none;
+    }
+    .tab-panel.active {
+      display: block;
+    }
+    .history-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      font-size: 0.95rem;
+    }
+    .history-table th,
+    .history-table td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .history-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    button {
+      background: #f2d20a;
+      border: none;
+      padding: 12px 20px;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 20px;
+      padding: 12px;
+      background: #f9f4d1;
+      border-radius: 6px;
+      display: none;
+    }
+    .hint {
+      font-size: 0.9rem;
+      color: #555;
+    }
+    /* Logo config section */
+    .logo-config {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 20px;
+      background: #fafafa;
+    }
+    .logo-config-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .logo-config-header h2 {
+      margin: 0;
+    }
+    .logo-config-body {
+      margin-top: 12px;
+    }
+    .logo-config-body.hidden {
+      display: none;
+    }
+    .logo-row {
+      display: flex;
+      gap: 24px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .logo-item {
+      flex: 1;
+      min-width: 200px;
+    }
+    .logo-preview {
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-top: 6px;
+      background: #eee;
+    }
+    .logo-preview.on-dark {
+      background: #333;
+    }
+    .logo-status {
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    .logo-status.ok {
+      color: #2a7d2a;
+    }
+    .logo-status.missing {
+      color: #b33;
+    }
+    .font-preview {
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      padding: 10px;
+      margin-top: 8px;
+      background: #fff;
+    }
+    .font-preview .sample-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0 0 4px 0;
+    }
+    .font-preview .sample-text {
+      margin: 0;
+      font-size: 0.95rem;
+    }
+    .btn-small {
+      background: #eee;
+      border: 1px solid #ccc;
+      padding: 6px 12px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .btn-small:hover {
+      background: #ddd;
+    }
+    .btn-delete {
+      background: #f5f5f5;
+      color: #c33;
+      border: 1px solid #dcc;
+    }
+    .btn-delete:hover {
+      background: #fdd;
+    }
+    /* Radio group */
+    .radio-group {
+      display: flex;
+      flex-wrap: wrap;
+      column-gap: 16px;
+      row-gap: 8px;
+      margin-bottom: 8px;
+      max-width: 100%;
+    }
+    .radio-group label {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+          white-space: nowrap;
+    }
+    .checkbox-row {
+      margin: 6px 0 8px 0;
+    }
+    .checkbox-row label {
+      font-weight: 500;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    textarea[readonly] {
+      background: #f5f5f5;
+    }
+  
+    .sync-indicator {
+      margin-top: 10px;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      background: #fafafa;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .sync-item {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      font-size: 0.95rem;
+    }
+    .sync-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 999px;
+      background: #bbb;
+      display: inline-block;
+    }
+    .sync-dot.ok { background: #2a7d2a; }
+    .sync-dot.bad { background: #b33; }
+    .sync-msg {
+      font-size: 0.85rem;
+      color: #555;
+    }
+
+    /* ============== MODAL PRÉVISUALISATION ============== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.6);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.active { display: flex; }
+    .modal {
+      background: white;
+      border-radius: 12px;
+      width: 100%;
+      max-width: 1100px;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 10px 15px rgba(0,0,0,.1), 0 4px 6px rgba(0,0,0,.05);
+    }
+    .modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .modal-title { font-size: 15px; font-weight: 600; }
+    .modal-header-actions { display: flex; gap: 8px; align-items: center; }
+    .modal-body { flex: 1; overflow: auto; padding: 0; }
+    .modal-body iframe {
+      width: 100%;
+      height: 600px;
+      border: none;
+    }
+    .modal-close {
+      background: #f4f4f4;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      color: #555;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+    }
+    .modal-close:hover { background: #eee; color: #333; }
+    .btn-print {
+      background: #1e3a5f;
+      color: white;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-print:hover { background: #2c5282; }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Créateur d'affiches A3</h1>
+    <p class="hint">Remplissez les champs pour générer une affiche A3 (PDF).</p>
+
+    <div class="tabs">
+      <button class="tab-button active" data-tab="atelierTab" type="button">Atelier</button>
+      <button class="tab-button" data-tab="spectacleTab" type="button">Spectacle</button>
+      <button class="tab-button" data-tab="logosTab" type="button">Logos &amp; police</button>
+      <button class="tab-button" data-tab="historyTab" type="button">Historique</button>
+    </div>
+
+    <div class="tab-panel active" id="atelierTab">
+
+      <div class="grid">
+      <div>
+        <label for="mainImage">Photo principale</label>
+        <input id="mainImage" type="file" accept="image/*" />
+      </div>
+      <div>
+        <label>Logo L'Hermine (haut gauche)</label>
+        <div class="radio-group">
+          <label><input type="radio" name="hermineChoice" value="noir" checked /> Noir</label>
+          <label><input type="radio" name="hermineChoice" value="blanc" /> Blanc</label>
+          <label><input type="radio" name="hermineChoice" value="aucun" /> Aucun</label>
+        </div>
+      </div>
+      <div>
+        <label for="title">Titre (ligne 1)</label>
+        <input id="title" type="text" required />
+      </div>
+      <div>
+        <label for="titleLine2">Titre (ligne 2, optionnel)</label>
+        <input id="titleLine2" type="text" />
+      </div>
+      <div>
+        <label for="subtitle">Sous-titre (optionnel)</label>
+        <input id="subtitle" type="text" />
+      </div>
+      <div>
+        <label for="subtitleText">Texte descriptif (optionnel)</label>
+        <textarea id="subtitleText"></textarea>
+      </div>
+      <div>
+        <label for="dateDay">Jour (format libre ou 02/02/26)</label>
+        <input id="dateDay" type="text" placeholder="Vendredi 20 février ou 02/02/26" required />
+      </div>
+      <div>
+        <label for="dateTime">Heure (optionnel)</label>
+        <input id="dateTime" type="text" placeholder="12h30" />
+      </div>
+      <div>
+        <label for="dateText">Texte sous la date (optionnel)</label>
+        <textarea id="dateText"></textarea>
+      </div>
+      <div>
+        <label for="footer">Infos bas de page</label>
+        <textarea id="footer">espace culturel l'hermine
+rue du Père Coudrin / 56370 Sarzeau
+
+► lhermine.bzh</textarea>
+      </div>
+    </div>
+      <input id="entryId" type="hidden" />
+      <div class="actions">
+        <button id="generate">Générer l'affiche</button>
+        <button id="preview" type="button" class="secondary">Prévisualiser</button>
+      </div>
+      <div class="result" id="result"></div>
+      <div class="sync-indicator" id="syncStatus">
+        <div class="sync-item"><span class="sync-dot" id="syncDotSheet"></span><strong>Sheet</strong></div>
+        <div class="sync-item"><span class="sync-dot" id="syncDotDrive"></span><strong>Drive</strong></div>
+        <div class="sync-msg" id="syncMsg"></div>
+      </div>
+    </div>
+
+    
+    <div class="tab-panel" id="spectacleTab">
+
+      <div class="grid">
+      <div>
+        <label for="sp_mainImage">Photo principale</label>
+        <input id="sp_mainImage" type="file" accept="image/*" />
+      </div>
+      <div>
+        <label>Logo L'Hermine (haut gauche)</label>
+        <div class="radio-group">
+          <label><input type="radio" name="sp_hermineChoice" value="noir" checked /> Noir</label>
+          <label><input type="radio" name="sp_hermineChoice" value="blanc" /> Blanc</label>
+          <label><input type="radio" name="sp_hermineChoice" value="aucun" /> Aucun</label>
+        </div>
+      </div>
+      <div>
+        <label for="sp_credit">Crédit photo (optionnel)</label>
+        <input id="sp_credit" type="text" placeholder="© Nom Prénom" />
+      </div>
+      <div>
+        <label for="sp_title">Titre (ligne 1)</label>
+        <input id="sp_title" type="text" required />
+      </div>
+      <div>
+        <label for="sp_titleLine2">Titre (ligne 2, optionnel)</label>
+        <input id="sp_titleLine2" type="text" />
+      </div>
+      <div>
+        <label for="sp_subtitle">Mention / compagnie / artiste (optionnel)</label>
+        <textarea id="sp_subtitle"></textarea>
+      </div>
+      <div>
+        <label for="sp_subtitleText">Discipline / genre (optionnel)</label>
+        <input id="sp_subtitleText" type="text" />
+      </div>
+      <div>
+        <label for="sp_dateDay">Jour (format libre ou 02/02/26)</label>
+        <input id="sp_dateDay" type="text" placeholder="Vendredi 20 février ou 02/02/26" required />
+      </div>
+      <div>
+        <label for="sp_dateTime">Heure / horaires (optionnel)</label>
+        <input id="sp_dateTime" type="text" placeholder="20h30 ou 10h, 11h, 15h et 18h" />
+      </div>
+      <div>
+        <label>Tarifs</label>
+        <div class="radio-group">
+          <label><input type="radio" name="sp_tariffTier" value="A+" /> A+</label>
+          <label><input type="radio" name="sp_tariffTier" value="A" /> A</label>
+          <label><input type="radio" name="sp_tariffTier" value="B" /> B</label>
+          <label><input type="radio" name="sp_tariffTier" value="C" checked /> C</label>
+          <label><input type="radio" name="sp_tariffTier" value="ENTREE_LIBRE" /> Entrée libre</label>
+          <label><input type="radio" name="sp_tariffTier" value="GRATUIT" /> Gratuit</label>
+        </div>
+      </div>
+
+      <div>
+        <label>Bas de page — Infos / Réservations</label>
+        <div class="checkbox-row">
+          <label><input id="sp_footerInfoAuto" type="checkbox" checked /> Auto</label>
+        </div>
+        <textarea id="sp_footerInfo" readonly>Infos &gt; 02 97 48 29 40 et lhermine.bzh
+Réservations &gt; billetterie.lhermine.bzh</textarea>
+      </div>
+
+      <div>
+        <label>Bas de page — Lieu</label>
+        <div class="checkbox-row">
+          <label><input id="sp_footerVenueAuto" type="checkbox" checked /> Auto</label>
+        </div>
+        <textarea id="sp_footerVenue" readonly>espace culturel l'hermine
+rue du Père Coudrin / 56370 Sarzeau</textarea>
+      </div>
+    </div>
+      <input id="sp_entryId" type="hidden" />
+      <div class="actions">
+        <button id="sp_generate">Générer l'affiche</button>
+        <button id="sp_preview" type="button" class="secondary">Prévisualiser</button>
+      </div>
+      <div class="result" id="sp_result"></div>
+      <div class="sync-indicator" id="sp_syncStatus">
+        <div class="sync-item"><span class="sync-dot" id="sp_syncDotSheet"></span><strong>Sheet</strong></div>
+        <div class="sync-item"><span class="sync-dot" id="sp_syncDotDrive"></span><strong>Drive</strong></div>
+        <div class="sync-msg" id="sp_syncMsg"></div>
+      </div>
+    </div>
+
+
+    <div class="tab-panel" id="logosTab">
+      <!-- Logo configuration -->
+      <div class="logo-config">
+      <div class="logo-config-header" onclick="toggleLogoConfig()">
+        <h2>Logos &amp; police</h2>
+        <span id="toggleArrow">&#9660;</span>
+      </div>
+      <div class="logo-config-body" id="logoConfigBody">
+        <p class="hint">Uploadez les logos et la police une seule fois. Ils seront sauvegardés dans votre navigateur.</p>
+        <div class="logo-row">
+          <div class="logo-item">
+            <label>Logo L'Hermine — Blanc</label>
+            <input id="uploadLogoHermineBlanc" type="file" accept="image/*" />
+            <div id="statusHermineBlanc" class="logo-status missing">Non configuré</div>
+            <img id="previewHermineBlanc" class="logo-preview on-dark" style="display:none;" />
+          </div>
+          <div class="logo-item">
+            <label>Logo L'Hermine — Noir</label>
+            <input id="uploadLogoHermineNoir" type="file" accept="image/*" />
+            <div id="statusHermineNoir" class="logo-status missing">Non configuré</div>
+            <img id="previewHermineNoir" class="logo-preview" style="display:none;" />
+          </div>
+          <div class="logo-item">
+            <label>Logo Sarzeau</label>
+            <input id="uploadLogoSarzeau" type="file" accept="image/*" />
+            <div id="statusSarzeau" class="logo-status missing">Non configuré</div>
+            <img id="previewSarzeau" class="logo-preview" style="display:none;" />
+          </div>
+        </div>
+        <div class="logo-row">
+          <div class="logo-item">
+            <label>Police VAG Rounded Std Bold</label>
+            <input id="uploadFontVagRounded" type="file" accept=".otf,.ttf,.woff,.woff2" />
+            <div id="statusFontVagRounded" class="logo-status missing">Non configuré</div>
+            <div class="font-preview" id="previewFontVagRounded" style="display:none;">
+              <p class="sample-title">VAG Rounded Std Bold</p>
+              <p class="sample-text">Aperçu rapide : 0123456789 &amp; Accents éèàç</p>
+            </div>
+          </div>
+        </div>
+        <button class="btn-small" onclick="clearLogos()">Réinitialiser les logos</button>
+      </div>
+    </div>
+    </div>
+
+    <div class="tab-panel" id="historyTab">
+      <h2>Historique des affiches</h2>
+      <p class="hint">Cliquez sur “Recharger” pour modifier une affiche existante puis régénérez-la.</p>
+      <div class="actions">
+        <button id="refreshHistory" type="button">Actualiser l'historique</button>
+      </div>
+      <div id="historyContent"></div>
+    </div>
+  </div>
+
+  <!-- Prévisualisation -->
+  <div id="previewModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-header">
+        <div class="modal-title">Prévisualisation de l'affiche</div>
+        <div class="modal-header-actions">
+          <button id="printPreview" type="button" class="btn-print">🖨 Imprimer</button>
+          <button id="closePreview" type="button" class="modal-close">✕ Fermer</button>
+        </div>
+      </div>
+      <div class="modal-body">
+        <iframe id="previewFrame" title="Prévisualisation" sandbox="allow-same-origin"></iframe>
+      </div>
+    </div>
+  </div>
+
+  <script>
+(function () {
+  'use strict';
+
+  function qs(sel, root) { return (root || document).querySelector(sel); }
+  function qsa(sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); }
+
+  // --- Voyants de synchronisation (Sheet / Drive) ---
+  function setSyncStatus(sync, kind) {
+    var prefix = (kind === 'spectacle') ? 'sp_' : '';
+    var box = qs('#' + prefix + 'syncStatus');
+    var dotSheet = qs('#' + prefix + 'syncDotSheet');
+    var dotDrive = qs('#' + prefix + 'syncDotDrive');
+    var msg = qs('#' + prefix + 'syncMsg');
+
+    if (!box || !dotSheet || !dotDrive || !msg) return;
+
+    if (!sync) {
+      box.style.display = 'none';
+      dotSheet.className = 'sync-dot';
+      dotDrive.className = 'sync-dot';
+      msg.textContent = '';
+      return;
+    }
+
+    box.style.display = 'flex';
+
+    var sheetOk = !!sync.sheetOk;
+    var driveOk = !!sync.driveOk;
+
+    dotSheet.className = 'sync-dot ' + (sheetOk ? 'ok' : 'bad');
+    dotDrive.className = 'sync-dot ' + (driveOk ? 'ok' : 'bad');
+
+    var parts = [];
+    if (!sheetOk && sync.sheetMsg) parts.push('Sheet: ' + sync.sheetMsg);
+    if (!driveOk && sync.driveMsg) parts.push('Drive: ' + sync.driveMsg);
+
+    msg.textContent = parts.join(' | ');
+  }
+
+
+  // --- Tabs ---
+  function setActiveTab(tabId) {
+    qsa('.tab-button').forEach(function (btn) {
+      btn.classList.toggle('active', btn.dataset.tab === tabId);
+    });
+    qsa('.tab-panel').forEach(function (panel) {
+      panel.classList.toggle('active', panel.id === tabId);
+    });
+  }
+
+  qsa('.tab-button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      setActiveTab(btn.dataset.tab);
+    });
+  });
+
+  // --- Logos / police (localStorage) ---
+  var LOGO_KEYS = {
+    hermineBlanc: 'logo_hermine_blanc',
+    hermineNoir: 'logo_hermine_noir',
+    sarzeau: 'logo_sarzeau',
+    fontVagRounded: 'font_vag_rounded_std_bold'
+  };
+
+  function toggleLogoConfig() {
+    var body = qs('#logoConfigBody');
+    var arrow = qs('#toggleArrow');
+    if (!body || !arrow) return;
+    var isHidden = body.classList.contains('hidden');
+    body.classList.toggle('hidden', !isHidden);
+    arrow.innerHTML = isHidden ? '&#9660;' : '&#9654;';
+  }
+  // expose for inline onclick already present
+  window.toggleLogoConfig = toggleLogoConfig;
+
+  function loadLogoPreview(storageKey, previewId, statusId) {
+    var data = localStorage.getItem(storageKey);
+    var preview = qs('#' + previewId);
+    var status = qs('#' + statusId);
+    if (!preview || !status) return;
+
+    if (data) {
+      preview.src = data;
+      preview.style.display = 'block';
+      status.textContent = 'OK';
+      status.className = 'logo-status ok';
+    } else {
+      preview.style.display = 'none';
+      status.textContent = 'Non configuré';
+      status.className = 'logo-status missing';
+    }
+  }
+
+  function ensureFontStyle() {
+    var existing = qs('#fontVagRoundedStyle');
+    if (existing) return existing;
+    var styleEl = document.createElement('style');
+    styleEl.id = 'fontVagRoundedStyle';
+    document.head.appendChild(styleEl);
+    return styleEl;
+  }
+
+  function applyFontFace(fontDataUrl) {
+    var styleEl = ensureFontStyle();
+    if (fontDataUrl) {
+      styleEl.textContent =
+        '@font-face {' +
+        'font-family: "VAG Rounded Std";' +
+        'font-style: normal;' +
+        'font-weight: 700;' +
+        'src: url(' + fontDataUrl + ');' +
+        '}';
+    } else {
+      styleEl.textContent = '';
+    }
+  }
+
+  function loadFontPreview() {
+    var data = localStorage.getItem(LOGO_KEYS.fontVagRounded);
+    var preview = qs('#previewFontVagRounded');
+    var status = qs('#statusFontVagRounded');
+    if (!preview || !status) return;
+
+    if (data) {
+      preview.style.display = 'block';
+      status.textContent = 'OK';
+      status.className = 'logo-status ok';
+      applyFontFace(data);
+    } else {
+      preview.style.display = 'none';
+      status.textContent = 'Non configuré';
+      status.className = 'logo-status missing';
+      applyFontFace('');
+    }
+  }
+
+  function initLogoPreviews() {
+    loadLogoPreview(LOGO_KEYS.hermineBlanc, 'previewHermineBlanc', 'statusHermineBlanc');
+    loadLogoPreview(LOGO_KEYS.hermineNoir, 'previewHermineNoir', 'statusHermineNoir');
+    loadLogoPreview(LOGO_KEYS.sarzeau, 'previewSarzeau', 'statusSarzeau');
+    loadFontPreview();
+  }
+
+  function setupLogoUpload(inputId, storageKey, previewId, statusId) {
+    var input = qs('#' + inputId);
+    if (!input) return;
+    input.addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        localStorage.setItem(storageKey, reader.result);
+        loadLogoPreview(storageKey, previewId, statusId);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function setupFontUpload() {
+    var input = qs('#uploadFontVagRounded');
+    if (!input) return;
+    input.addEventListener('change', function (e) {
+      var file = e.target.files && e.target.files[0];
+      if (!file) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        localStorage.setItem(LOGO_KEYS.fontVagRounded, reader.result);
+        loadFontPreview();
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function clearLogos() {
+    Object.keys(LOGO_KEYS).forEach(function (k) {
+      localStorage.removeItem(LOGO_KEYS[k]);
+    });
+    initLogoPreviews();
+  }
+  window.clearLogos = clearLogos;
+
+  setupLogoUpload('uploadLogoHermineBlanc', LOGO_KEYS.hermineBlanc, 'previewHermineBlanc', 'statusHermineBlanc');
+  setupLogoUpload('uploadLogoHermineNoir', LOGO_KEYS.hermineNoir, 'previewHermineNoir', 'statusHermineNoir');
+  setupLogoUpload('uploadLogoSarzeau', LOGO_KEYS.sarzeau, 'previewSarzeau', 'statusSarzeau');
+  setupFontUpload();
+  initLogoPreviews();
+
+  // --- Spectacle : 2 blocs bas de page (auto) ---
+  var SPECTACLE_INFOS_LINE = "Infos > 02 97 48 29 40 et lhermine.bzh";
+  var SPECTACLE_RESERVATIONS_LINE = "Réservations > billetterie.lhermine.bzh";
+  var SPECTACLE_ADDRESS_LINE1 = "espace culturel l'hermine";
+  var SPECTACLE_ADDRESS_LINE2 = "rue du Père Coudrin / 56370 Sarzeau";
+
+  function buildSpectacleFooterInfoAuto() {
+    return SPECTACLE_INFOS_LINE + "\n" + SPECTACLE_RESERVATIONS_LINE;
+  }
+  function buildSpectacleFooterVenueAuto() {
+    return SPECTACLE_ADDRESS_LINE1 + "\n" + SPECTACLE_ADDRESS_LINE2;
+  }
+
+  function applySpectacleFooterBlocksMode() {
+    var infoAuto = qs('#sp_footerInfoAuto');
+    var infoField = qs('#sp_footerInfo');
+    var venueAuto = qs('#sp_footerVenueAuto');
+    var venueField = qs('#sp_footerVenue');
+
+    if (infoAuto && infoField) {
+      if (infoAuto.checked) {
+        infoField.value = buildSpectacleFooterInfoAuto();
+        infoField.readOnly = true;
+      } else {
+        infoField.readOnly = false;
+      }
+    }
+
+    if (venueAuto && venueField) {
+      if (venueAuto.checked) {
+        venueField.value = buildSpectacleFooterVenueAuto();
+        venueField.readOnly = true;
+      } else {
+        venueField.readOnly = false;
+      }
+    }
+  }
+
+  var infoAutoEl = qs('#sp_footerInfoAuto');
+  if (infoAutoEl) infoAutoEl.addEventListener('change', applySpectacleFooterBlocksMode);
+  var venueAutoEl = qs('#sp_footerVenueAuto');
+  if (venueAutoEl) venueAutoEl.addEventListener('change', applySpectacleFooterBlocksMode);
+  applySpectacleFooterBlocksMode();
+
+  // --- Util ---
+  function readAsDataUrl(file) {
+    return new Promise(function (resolve, reject) {
+      if (!file) { resolve(''); return; }
+      var reader = new FileReader();
+      reader.onload = function () { resolve(reader.result); };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  function getRadioValue(name) {
+    var el = qs('input[name="' + name + '"]:checked');
+    return el ? el.value : '';
+  }
+
+  // --- Génération affiche ---
+  async function handleGenerate(kind) {
+    var prefix = (kind === 'spectacle') ? 'sp_' : '';
+    var radioName = (kind === 'spectacle') ? 'sp_hermineChoice' : 'hermineChoice';
+    var entryIdField = prefix + 'entryId';
+    var resultField = prefix + 'result';
+
+    var entryIdEl = qs('#' + entryIdField);
+    var resultEl = qs('#' + resultField);
+    if (!entryIdEl || !resultEl) return;
+
+    var hermineChoice = getRadioValue(radioName);
+    var topLogo = '';
+    if (hermineChoice === 'noir') topLogo = localStorage.getItem(LOGO_KEYS.hermineNoir) || '';
+    if (hermineChoice === 'blanc') topLogo = localStorage.getItem(LOGO_KEYS.hermineBlanc) || '';
+    var bottomLogo = localStorage.getItem(LOGO_KEYS.sarzeau) || '';
+
+    var entryId = (entryIdEl.value || '').trim();
+    if (entryId) {
+      var choix = prompt("Cette affiche existe déjà.\n\n1 — Écraser l'ancienne version\n2 — Créer une nouvelle affiche\n\nTapez 1 ou 2 :");
+      if (choix === '2') entryId = '';
+      else if (choix !== '1') return;
+    }
+
+    var payload = {
+      category: kind,
+      entryId: entryId,
+      title: (qs('#' + prefix + 'title') || {}).value ? qs('#' + prefix + 'title').value.trim() : '',
+      titleLine2: (qs('#' + prefix + 'titleLine2') || {}).value ? qs('#' + prefix + 'titleLine2').value.trim() : '',
+      subtitle: (qs('#' + prefix + 'subtitle') || {}).value ? qs('#' + prefix + 'subtitle').value.trim() : '',
+      subtitleText: (qs('#' + prefix + 'subtitleText') || {}).value ? qs('#' + prefix + 'subtitleText').value.trim() : '',
+      dateDay: (qs('#' + prefix + 'dateDay') || {}).value ? qs('#' + prefix + 'dateDay').value.trim() : '',
+      dateTime: (qs('#' + prefix + 'dateTime') || {}).value ? qs('#' + prefix + 'dateTime').value.trim() : '',
+      dateText: (qs('#' + prefix + 'dateText') || {}).value ? qs('#' + prefix + 'dateText').value.trim() : '',
+      mainImage: await readAsDataUrl((qs('#' + prefix + 'mainImage') || {}).files ? qs('#' + prefix + 'mainImage').files[0] : null),
+      topLogo: topLogo,
+      bottomLogo: bottomLogo,
+      fontVagRounded: localStorage.getItem(LOGO_KEYS.fontVagRounded) || '',
+      hermineChoice: hermineChoice
+    };
+
+    if (kind !== 'spectacle') {
+      var footerEl = qs('#footer');
+      payload.footer = footerEl ? footerEl.value.trim() : '';
+    } else {
+      payload.tariffTier = getRadioValue('sp_tariffTier');
+      payload.credit = (qs('#sp_credit') || {}).value ? qs('#sp_credit').value.trim() : '';
+
+      var spInfoAuto = qs('#sp_footerInfoAuto');
+      var spVenueAuto = qs('#sp_footerVenueAuto');
+      payload.footerInfoAuto = spInfoAuto ? !!spInfoAuto.checked : false;
+      payload.footerVenueAuto = spVenueAuto ? !!spVenueAuto.checked : false;
+
+      payload.footerInfo = (qs('#sp_footerInfo') || {}).value ? qs('#sp_footerInfo').value.trim() : '';
+      payload.footerVenue = (qs('#sp_footerVenue') || {}).value ? qs('#sp_footerVenue').value.trim() : '';
+    }
+
+    if (!payload.title || !payload.dateDay) {
+      alert('Merci de remplir le titre et le jour.');
+      return;
+    }
+
+    if (kind === 'spectacle' && !payload.tariffTier) {
+      alert('Merci de choisir un tarif.');
+      return;
+    }
+
+    if (hermineChoice !== 'aucun' && !topLogo) {
+      alert('Le logo L\'Hermine (' + hermineChoice + ') n\'a pas été configuré. Allez dans l\'onglet « Logos & police » pour l\'uploader.');
+      return;
+    }
+
+    google.script.run
+      .withSuccessHandler(function (result) {
+        resultEl.style.display = 'block';
+        resultEl.innerHTML =
+          'Fichier PDF créé :<br />' +
+          '<a href="' + result.pdfUrl + '" target="_blank">Télécharger PDF</a>';
+        if (result.entryId) entryIdEl.value = result.entryId;
+        setSyncStatus(result && result.sync ? result.sync : null, kind);
+        loadHistory();
+      })
+      .withFailureHandler(function (error) {
+        setSyncStatus({sheetOk:false, driveOk:false, sheetMsg:(error && error.message)?error.message:String(error), driveMsg:(error && error.message)?error.message:String(error)}, kind);
+        alert('Erreur : ' + (error && error.message ? error.message : String(error)));
+      })
+      .createPoster(JSON.stringify(payload));
+  }
+
+  var genBtn = qs('#generate');
+  if (genBtn) genBtn.addEventListener('click', function () { handleGenerate('atelier'); });
+  var prevBtn = qs('#preview');
+  if (prevBtn) prevBtn.addEventListener('click', function () { handlePreview('atelier'); });
+  var spGenBtn = qs('#sp_generate');
+  if (spGenBtn) spGenBtn.addEventListener('click', function () { handleGenerate('spectacle'); });
+  var spPrevBtn = qs('#sp_preview');
+  if (spPrevBtn) spPrevBtn.addEventListener('click', function () { handlePreview('spectacle'); });
+
+  var closePrev = qs('#closePreview');
+  if (closePrev) closePrev.addEventListener('click', closePreview);
+  var printPrev = qs('#printPreview');
+  if (printPrev) printPrev.addEventListener('click', printPreview);
+  var overlay = qs('#previewModal');
+  if (overlay) overlay.addEventListener('click', function (e) { if (e.target === overlay) closePreview(); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closePreview();
+  });
+  async function collectPayload(kind, entryIdOverride) {
+    var prefix = (kind === 'spectacle') ? 'sp_' : '';
+    var radioName = (kind === 'spectacle') ? 'sp_hermineChoice' : 'hermineChoice';
+    var hermineChoice = getRadioValue(radioName);
+
+    var topLogo = '';
+    if (hermineChoice === 'noir') topLogo = localStorage.getItem(LOGO_KEYS.hermineNoir) || '';
+    if (hermineChoice === 'blanc') topLogo = localStorage.getItem(LOGO_KEYS.hermineBlanc) || '';
+    var bottomLogo = localStorage.getItem(LOGO_KEYS.sarzeau) || '';
+
+    if (hermineChoice !== 'aucun' && !topLogo) {
+      alert('Le logo L\'Hermine (' + hermineChoice + ') n\'a pas été configuré. Allez dans l\'onglet « Logos & police » pour l\'uploader.');
+      return null;
+    }
+
+    // Lire l'image en base64 (comme handleGenerate)
+    var imageFile = (qs('#' + prefix + 'mainImage') || {}).files ? qs('#' + prefix + 'mainImage').files[0] : null;
+    var mainImageData = await readAsDataUrl(imageFile);
+
+    var payload = {
+      category: kind,
+      entryId: (entryIdOverride || '').trim(),
+      title: (qs('#' + prefix + 'title') || {}).value ? qs('#' + prefix + 'title').value.trim() : '',
+      titleLine2: (qs('#' + prefix + 'titleLine2') || {}).value ? qs('#' + prefix + 'titleLine2').value.trim() : '',
+      subtitle: (qs('#' + prefix + 'subtitle') || {}).value ? qs('#' + prefix + 'subtitle').value.trim() : '',
+      subtitleText: (qs('#' + prefix + 'subtitleText') || {}).value ? qs('#' + prefix + 'subtitleText').value.trim() : '',
+      dateDay: (qs('#' + prefix + 'dateDay') || {}).value ? qs('#' + prefix + 'dateDay').value.trim() : '',
+      dateTime: (qs('#' + prefix + 'dateTime') || {}).value ? qs('#' + prefix + 'dateTime').value.trim() : '',
+      dateText: (qs('#' + prefix + 'dateText') || {}).value ? qs('#' + prefix + 'dateText').value.trim() : '',
+      mainImage: mainImageData,
+      credit: (qs('#' + prefix + 'credit') || {}).value ? qs('#' + prefix + 'credit').value.trim() : '',
+      topLogo: topLogo,
+      bottomLogo: bottomLogo,
+      fontVagRounded: localStorage.getItem(LOGO_KEYS.fontVagRounded) || '',
+      hermineChoice: hermineChoice
+    };
+
+    // Champs spécifiques selon le type
+    if (kind !== 'spectacle') {
+      payload.footer = (qs('#footer') || {}).value ? qs('#footer').value.trim() : '';
+    } else {
+      payload.tariffTier = getRadioValue('sp_tariffTier');
+
+      var spInfoAuto = qs('#sp_footerInfoAuto');
+      var spVenueAuto = qs('#sp_footerVenueAuto');
+      payload.footerInfoAuto = spInfoAuto ? !!spInfoAuto.checked : false;
+      payload.footerVenueAuto = spVenueAuto ? !!spVenueAuto.checked : false;
+      payload.footerInfo = (qs('#sp_footerInfo') || {}).value ? qs('#sp_footerInfo').value.trim() : '';
+      payload.footerVenue = (qs('#sp_footerVenue') || {}).value ? qs('#sp_footerVenue').value.trim() : '';
+    }
+
+    if (!payload.title || !payload.dateDay) {
+      alert('Merci de remplir le titre et le jour.');
+      return null;
+    }
+
+    if (kind === 'spectacle' && !payload.tariffTier) {
+      alert('Merci de choisir un tarif.');
+      return null;
+    }
+
+    return payload;
+  }
+
+  function openPreview(html) {
+    var overlay = qs('#previewModal');
+    var frame = qs('#previewFrame');
+    if (!overlay || !frame) return;
+    frame.srcdoc = html || '';
+    overlay.classList.add('active');
+  }
+
+  function closePreview() {
+    var overlay = qs('#previewModal');
+    var frame = qs('#previewFrame');
+    if (frame) frame.srcdoc = '';
+    if (overlay) overlay.classList.remove('active');
+  }
+
+  function printPreview() {
+    var frame = qs('#previewFrame');
+    if (frame && frame.contentWindow) {
+      frame.contentWindow.focus();
+      frame.contentWindow.print();
+    }
+  }
+
+  async function handlePreview(kind) {
+    var prefix = (kind === 'spectacle') ? 'sp_' : '';
+    var entryIdEl = qs('#' + prefix + 'entryId');
+    var entryId = entryIdEl ? (entryIdEl.value || '').trim() : '';
+    var payload = await collectPayload(kind, entryId);
+    if (!payload) return;
+
+    setSyncStatus(null, kind);
+    var resultEl = qs('#' + prefix + 'result');
+    if (resultEl) {
+      resultEl.style.display = 'block';
+      resultEl.innerHTML = 'Prévisualisation en cours...';
+    }
+
+    google.script.run
+      .withSuccessHandler(function (res) {
+        if (resultEl) resultEl.style.display = 'none';
+        if (res && res.ok && res.html) openPreview(res.html);
+        else alert('Prévisualisation : réponse invalide.');
+      })
+      .withFailureHandler(function (err) {
+        if (resultEl) resultEl.innerHTML = 'Erreur prévisualisation : ' + (err && err.message ? err.message : err);
+      })
+      .previewPoster(JSON.stringify(payload));
+  }
+
+
+  // --- Historique ---
+  function loadHistory() {
+    google.script.run
+      .withSuccessHandler(function (res) { var entries = (res && res.entries) ? res.entries : []; renderHistory(entries); setSyncStatus(res && res.sync ? res.sync : null); })
+      .withFailureHandler(function (error) {
+        alert('Erreur : ' + (error && error.message ? error.message : String(error)));
+      })
+      .listPosterEntriesEx();
+  }
+
+  function renderHistory(entries) {
+    var container = qs('#historyContent');
+    if (!container) return;
+
+    if (!entries.length) {
+      container.innerHTML = '<p class="hint">Aucune affiche sauvegardée pour le moment.</p>';
+      return;
+    }
+
+    var rows = entries.map(function (entry) {
+      var typeLabel = (entry.category === 'spectacle') ? 'Spectacle' : 'Atelier';
+      var dateLabel = (entry.dateDay || '') + (entry.dateTime ? ' / ' + entry.dateTime : '');
+      var safeTitle = (entry.title || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+      var safeId = (entry.id || '').replace(/&/g,'&amp;').replace(/"/g,'&quot;');
+      return '<tr>' +
+        '<td>' + (entry.updatedAt || '') + '</td>' +
+        '<td>' + typeLabel + '</td>' +
+        '<td>' + safeTitle + '</td>' +
+        '<td>' + dateLabel + '</td>' +
+        '<td>' + (entry.pdfUrl ? '<a href="' + entry.pdfUrl + '" target="_blank">PDF</a>' : '') + '</td>' +
+        '<td class="history-actions">' +
+          '<button type="button" data-entry-id="' + safeId + '">Recharger</button>' +
+          '<button type="button" class="btn-toggle" data-toggle-id="' + safeId + '">' + ((entry.category === 'spectacle') ? 'Passer en Atelier' : 'Passer en Spectacle') + '</button>' +
+          '<button type="button" class="btn-delete" data-delete-id="' + safeId + '" data-delete-title="' + safeTitle + '">Supprimer</button>' +
+        '</td>' +
+      '</tr>';
+    }).join('');
+
+    container.innerHTML =
+      '<table class="history-table">' +
+        '<thead><tr><th>Dernière mise à jour</th><th>Type</th><th>Titre</th><th>Date/Heure</th><th>PDF</th><th>Actions</th></tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+
+    qsa('button[data-entry-id]', container).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var entry = entries.find(function (it) { return it.id === btn.dataset.entryId; });
+        if (entry) populateForm(entry);
+      });
+    });
+
+    qsa('button[data-delete-id]', container).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var title = btn.dataset.deleteTitle || 'cette affiche';
+        if (!confirm('Supprimer « ' + title + ' » ?\n\nLe PDF sur le Drive et la ligne dans le tableau seront supprimés.')) return;
+
+        btn.disabled = true;
+        btn.textContent = '...';
+        google.script.run
+          .withSuccessHandler(function (res) { setSyncStatus(res && res.sync ? res.sync : null, 'atelier'); loadHistory(); })
+          .withFailureHandler(function (error) {
+            alert('Erreur : ' + (error && error.message ? error.message : String(error)));
+            btn.disabled = false;
+            btn.textContent = 'Supprimer';
+          })
+          .deletePosterEntry(btn.dataset.deleteId);
+      });
+    });
+    qsa('button[data-toggle-id]', container).forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var toggleId = btn.dataset.toggleId;
+        btn.disabled = true;
+        var prevText = btn.textContent;
+        btn.textContent = '...';
+        google.script.run
+          .withSuccessHandler(function (res) {
+            if (res && res.ok) {
+              loadHistory();
+            } else {
+              alert('Erreur : ' + (res && res.error ? res.error : 'Réponse inattendue'));
+              btn.disabled = false;
+              btn.textContent = prevText;
+            }
+          })
+          .withFailureHandler(function (error) {
+            alert('Erreur : ' + (error && error.message ? error.message : String(error)));
+            btn.disabled = false;
+            btn.textContent = prevText;
+          })
+          .togglePosterCategory(toggleId);
+      });
+    });
+
+  }
+
+  function stripLeadingSpectacleTarifLine(text) {
+    var t = String(text || '').replace(/\r\n/g, '\n');
+    var lines = t.split('\n');
+    if (!lines.length) return '';
+    var first = (lines[0] || '').trim().toLowerCase();
+    if (first.indexOf('tarif unique') === 0 || first.indexOf('tarifs de') === 0) {
+      lines.shift();
+      while (lines.length && lines[0] === '') lines.shift();
+      return lines.join('\n');
+    }
+    return t;
+  }
+
+  function parseLegacySpectacleFooterBlocks(footerText) {
+    var rest = stripLeadingSpectacleTarifLine(footerText || '').trim();
+    if (!rest) return { info: '', venue: '' };
+    var parts = rest.split(/\n{2,}/);
+    var info = (parts[0] || '').trim();
+    var venue = (parts.slice(1).join('\n\n') || '').trim();
+    return { info: info, venue: venue };
+  }
+
+  function inferTierFromText(text) {
+    var t = String(text || '').toLowerCase();
+    if (t.indexOf('entrée libre') !== -1 || t.indexOf('entree libre') !== -1) return 'ENTREE_LIBRE';
+    if (t.indexOf('gratuit') !== -1) return 'GRATUIT';
+    if (t.indexOf('10') !== -1 && t.indexOf('22') !== -1) return 'A+';
+    if (t.indexOf('8') !== -1 && t.indexOf('17') !== -1) return 'A';
+    if (t.indexOf('6') !== -1 && t.indexOf('13') !== -1) return 'B';
+    if (t.indexOf('unique') !== -1 && t.indexOf('5') !== -1) return 'C';
+    return '';
+  }
+
+  function populateForm(entry) {
+    var kind = (entry && entry.category === 'spectacle') ? 'spectacle' : 'atelier';
+    var prefix = (kind === 'spectacle') ? 'sp_' : '';
+    var radioName = (kind === 'spectacle') ? 'sp_hermineChoice' : 'hermineChoice';
+
+    var entryIdAtelier = qs('#entryId');
+    var entryIdSpectacle = qs('#sp_entryId');
+    if (entryIdAtelier) entryIdAtelier.value = '';
+    if (entryIdSpectacle) entryIdSpectacle.value = '';
+
+    var entryIdEl = qs('#' + prefix + 'entryId');
+    if (entryIdEl) entryIdEl.value = entry.id || '';
+
+    if (qs('#' + prefix + 'title')) qs('#' + prefix + 'title').value = entry.title || '';
+    if (qs('#' + prefix + 'titleLine2')) qs('#' + prefix + 'titleLine2').value = entry.titleLine2 || '';
+    if (qs('#' + prefix + 'subtitle')) qs('#' + prefix + 'subtitle').value = entry.subtitle || '';
+    if (qs('#' + prefix + 'subtitleText')) qs('#' + prefix + 'subtitleText').value = entry.subtitleText || '';
+    if (qs('#' + prefix + 'dateDay')) qs('#' + prefix + 'dateDay').value = entry.dateDay || '';
+    if (qs('#' + prefix + 'dateTime')) qs('#' + prefix + 'dateTime').value = entry.dateTime || '';
+    if (qs('#' + prefix + 'dateText')) qs('#' + prefix + 'dateText').value = entry.dateText || '';
+    // Fusion Spectacle : "Mention" + "Compagnie / artiste" dans un seul champ (sp_subtitle)
+    if (kind === 'spectacle') {
+      var mergedCaption = '';
+      if (entry.subtitle) mergedCaption = entry.subtitle || '';
+      if (entry.dateText) mergedCaption = mergedCaption ? (mergedCaption + '\n' + entry.dateText) : entry.dateText;
+      if (qs('#sp_subtitle')) qs('#sp_subtitle').value = mergedCaption;
+      if (qs('#sp_dateText')) qs('#sp_dateText').value = '';
+    }
+
+    if (kind === 'spectacle') {
+      var tierValue = entry.tariffTier || inferTierFromText(entry.tarifs || '') || inferTierFromText((entry.footer || '').split(/\r?\n/)[0] || '');
+      if (tierValue) {
+        var tierEl = qs('input[name="sp_tariffTier"][value="' + tierValue + '"]');
+        if (tierEl) tierEl.checked = true;
+      }
+
+      if (qs('#sp_credit')) qs('#sp_credit').value = entry.credit || '';
+
+      var infoAuto = qs('#sp_footerInfoAuto');
+      var venueAuto = qs('#sp_footerVenueAuto');
+      var infoField = qs('#sp_footerInfo');
+      var venueField = qs('#sp_footerVenue');
+
+      var hasExplicitBlocks =
+        (entry.footerInfo != null) || (entry.footerVenue != null) ||
+        (entry.footerInfoAuto != null) || (entry.footerVenueAuto != null);
+
+      if (hasExplicitBlocks) {
+        if (infoAuto) infoAuto.checked = !!entry.footerInfoAuto;
+        if (venueAuto) venueAuto.checked = !!entry.footerVenueAuto;
+        if (infoField) infoField.value = String(entry.footerInfo || '').replace(/\r\n/g, '\n').trim();
+        if (venueField) venueField.value = String(entry.footerVenue || '').replace(/\r\n/g, '\n').trim();
+      } else {
+        var legacy = parseLegacySpectacleFooterBlocks(entry.footer || '');
+        if (infoAuto) infoAuto.checked = false;
+        if (venueAuto) venueAuto.checked = false;
+        if (infoField) infoField.value = legacy.info;
+        if (venueField) venueField.value = legacy.venue;
+      }
+
+      applySpectacleFooterBlocksMode();
+    } else {
+      if (qs('#footer')) qs('#footer').value = entry.footer || '';
+    }
+
+    if (entry.hermineChoice) {
+      var opt = qs('input[name="' + radioName + '"][value="' + entry.hermineChoice + '"]');
+      if (opt) opt.checked = true;
+    }
+
+    setActiveTab(kind === 'spectacle' ? 'spectacleTab' : 'atelierTab');
+  }
+
+  var refreshBtn = qs('#refreshHistory');
+  if (refreshBtn) refreshBtn.addEventListener('click', function () { loadHistory(); });
+
+  loadHistory();
+})();
+</script>
+
+</body>
+</html>
