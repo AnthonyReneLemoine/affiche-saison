@@ -123,6 +123,10 @@
         </div>
       </div>
       <div>
+        <label for="credit">Crédit photo (optionnel)</label>
+        <input id="credit" type="text" placeholder="© Nom Prénom" />
+      </div>
+      <div>
         <label for="title">Titre (ligne 1)</label>
         <input id="title" type="text" />
       </div>
@@ -572,6 +576,7 @@ rue du Père Coudrin / 56370 Sarzeau</textarea>
 
     if (kind !== 'spectacle') {
       payload.footer = v('footer');
+      payload.credit = v('credit');
     } else {
       payload.credit        = v('sp_credit');
       payload.tariffTier    = getRadioValue('sp_tariffTier');
@@ -877,7 +882,7 @@ rue du Père Coudrin / 56370 Sarzeau</textarea>
   // Reset formulaires
   // ========================
   function resetAtelier() {
-    ['title','titleLine2','subtitle','subtitleText','dateDay','dateTime','dateText','entryId'].forEach(function(id) { var el = qs('#'+id); if (el) el.value = ''; });
+    ['title','titleLine2','subtitle','subtitleText','dateDay','dateTime','dateText','credit','entryId'].forEach(function(id) { var el = qs('#'+id); if (el) el.value = ''; });
     qs('#footer').value = "espace culturel l'hermine\nrue du Père Coudrin / 56370 Sarzeau\n\n► lhermine.bzh";
     qs('#mainImage').value = '';
     var r = qs('input[name="hermineChoice"][value="noir"]'); if (r) r.checked = true;
@@ -917,6 +922,7 @@ rue du Père Coudrin / 56370 Sarzeau</textarea>
     };
     if (kind !== 'spectacle') {
       data.footer = v('footer');
+      data.credit = v('credit');
     } else {
       data.credit          = v('sp_credit');
       data.tariffTier      = getRadioValue('sp_tariffTier');
@@ -970,6 +976,7 @@ rue du Père Coudrin / 56370 Sarzeau</textarea>
 
         if (kind !== 'spectacle') {
           set('footer', data.footer);
+          set('credit', data.credit);
         } else {
           set('sp_credit', data.credit);
           if (data.tariffTier) {
